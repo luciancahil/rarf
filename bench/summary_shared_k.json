@@ -1,0 +1,11 @@
+{
+  "setup": "RaRF-Shared(k)",
+  "tau": 0.4,
+  "k": 5,
+  "n_test": 73,
+  "mae": 0.3709034360730593,
+  "rmse": 0.5191123835766027,
+  "r2": 0.9077967565307332,
+  "union": 84,
+  "mean_neighbors_per_target": 5.0
+}

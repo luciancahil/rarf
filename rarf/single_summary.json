@@ -1,0 +1,21 @@
+{
+  "radius": 0.4,
+  "budget": 30,
+  "tau": 0.6,
+  "metrics_shared": {
+    "MAE": 0.2662054908675805,
+    "RMSE": 0.3977941358097403,
+    "R2": 0.9561589489016122,
+    "n": 73
+  },
+  "metrics_baseline": {
+    "MAE": 0.26959891122005886,
+    "RMSE": 0.3978663093305733,
+    "R2": 0.9561430389131339,
+    "n": 73
+  },
+  "coverage_shared_targets": 47,
+  "n_test": 73,
+  "n_selected": 30,
+  "pred_csv": "single_rarf_compare_shared_vs_baseline.csv"
+}

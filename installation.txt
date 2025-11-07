@@ -1,0 +1,6 @@
+conda install anaconda::scikit-learn
+conda install conda-forge::umap-learn
+conda install anaconda::pandas
+conda install conda-forge::matplotlib
+conda install conda-forge::rdkit
+conda install anaconda::openpyxl

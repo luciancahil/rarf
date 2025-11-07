@@ -1,0 +1,33 @@
+{
+  "excel": "Nature_SMILES.xlsx",
+  "sheet": "auto",
+  "target_col": "DDG",
+  "radius": 0.4,
+  "tau_primary": 0.6,
+  "fallback": 0.6,
+  "tau_fallback": 0.4,
+  "bits_per_part": 2048,
+  "rf_estimators": 300,
+  "seed": 42,
+  "test_size": 0.2,
+  "n_test": 73,
+  "n_train": 292,
+  "mae": 0.2703476111901792,
+  "rmse": 0.3965603885639,
+  "r2": 0.9564304707456129,
+  "per_target_cost": 1399,
+  "unique_experiment_cost": 279,
+  "method_counts": {
+    "primary": 73,
+    "fallback": 0,
+    "nearest": 0
+  },
+  "runtime_sec": 27.932,
+  "outputs": [
+    "preds.csv",
+    "rarf_coverage_report.csv",
+    "usage_edges.csv",
+    "usage_matrix.csv",
+    "summary.json"
+  ]
+}

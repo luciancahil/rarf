@@ -1,0 +1,36 @@
+run_rarf_visual.py is the entry point.
+
+Umap is dimension reduction.
+
+Fit + predict has 99% the same code, just branches at the end.
+
+
+From paper (Representation).
+    Imagine each reaction exists in a space. You could group the reactions in this space into families, some of which overlap.
+    We want two things: Ensure all regions are covered by at least one family, and that we have a model that can handle each family well.
+    The output is a vector, where each vector represents enantio selectivity in that target reaction.
+    Reactions are the input, and they are embedded in a feature space (think they already are in csv).
+    Similarity is Jaccard. Also used to calculate distance. Tau defines whether something is "in" a neighbourhood. 
+        I assume there's a center? Sort of like KNN?
+        Yes. The "target" reactions mentioned above are the centers.
+    We select a K. We want at least K candidate reactions to cover each target. Think of that as the family around the target. Families can overlap.
+
+
+From Paper (Training).
+    There are 2 phases.
+    Phase one trains a subset. We add to a subset based on utility. Utility is based on making sure each target is served, so we target underserved nodes, and candidates that serve underserved get picked.
+    We add to set greedily. Continue until are targets are covered, or a budget is reached.
+    Phase 2:
+    If budget is reached, and some are still underserved, add closest to underserved.
+
+
+    After this is all done, just train a random forest on each.
+
+TODO:
+Read paper.
+
+Double check all the code.
+
+Test 8 datasets (same as the paper, under supporting information).
+
+Test a bunch of similarities (see sent paper).
