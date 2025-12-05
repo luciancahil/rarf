@@ -22,7 +22,6 @@ def load_data():
     smiles_all = []
 
     for index, row in df.iterrows():
-        print(index, row)
         cur_smiles = solvent[row["Solvent"]] + imine[row["Imine"]] + nuc[row["Nucleophile"]] + ligand[row["Ligand"]]
 
         smiles_all.append(cur_smiles)
@@ -46,7 +45,6 @@ smiles_all = solvent["SMILES_s"].values"""
 # Convert to Morgan fingerprints
 X = np.array([smi2morgan(s, nbits=2048) for s in smiles_all])
 X = np.vstack(X)
-breakpoint()
 
 # Split data
 X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.8, random_state=42)
@@ -55,6 +53,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.8, random
 rarf = RaRFRegressor(radius=0.4, metric="jaccard")
 out = rarf.fit_predict_shared(X_train, y_train, X_test, budget=30, alpha=1.2, redundancy_lambda=0.1)
 
+breakpoint()
 print("Selected training indices:", out["selected"])
 print("Average neighbors per target:", np.mean(out["neighbor_counts"]))
 print("Predictions shape:", out["preds"].shape)
