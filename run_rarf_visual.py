@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from RaRFRegressor_shared_overlap_visual import RaRFRegressor
 from utils import smi2morgan
+import matplotlib.pyplot as plt
 
 def load_data():
     xlsx = "Nature_SMILES.xlsx"
@@ -56,7 +57,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.8, random
 rarf = RaRFRegressor(radius=0.4, metric="jaccard")
 out = rarf.fit_predict_shared(X_train, y_train, X_test, budget=30, alpha=1.2, redundancy_lambda=0.1)
 
-breakpoint()
 print("Selected training indices:", out["selected"])
 print("Average neighbors per target:", np.mean(out["neighbor_counts"]))
 print("Predictions shape:", out["preds"].shape)
@@ -65,5 +65,11 @@ print("Predictions shape:", out["preds"].shape)
 rarf.plot_overlap_map(X_train, X_test, out["selected"])
 print("Saved plot as overlap_map.png")
 
+breakpoint()
 
-## TODO: ASK ABOUT MASTERS TRANSFERS YOU DONUT
+plt.clf()
+plt.scatter(out['preds'], y_test)
+
+plt.show()
+# Find out where the error is.
+#PLOT The Prediction vs Actual.

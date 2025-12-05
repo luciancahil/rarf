@@ -77,7 +77,7 @@ class RaRFRegressor:
 
     def fit_predict_shared(self, X_train, y_train, X_test, budget=None, alpha=1.0, redundancy_lambda=0.0,
                            similarity_threshold=None,
-                           enrich_min_per_target: int = 0,   # if >0, add extra neighbors beyond shared to reach this #
+                           enrich_min_per_target: int = 1,   # if >0, add extra neighbors beyond shared to reach this #
                            enrich_from: str = "neighbors",   # "neighbors" (within tau) or "all" (top-K from all train)
                            enrich_max_extra: int = 10        # safety cap on per-target added points
                            ):
@@ -145,7 +145,6 @@ class RaRFRegressor:
         # I think this is wrong?
         train_emb = embedding[:n_train]
         test_emb = embedding[n_train:]
-        breakpoint()
 
         import matplotlib.pyplot as plt
         plt.figure(figsize=(7,6))
