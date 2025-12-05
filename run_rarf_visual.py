@@ -6,7 +6,7 @@ from RaRFRegressor_shared_overlap_visual import RaRFRegressor
 from utils import smi2morgan
 import matplotlib.pyplot as plt
 
-def load_data():
+def load_nature_data():
     xlsx = "Nature_SMILES.xlsx"
     df = pd.read_excel(xlsx, sheet_name="df")
 
@@ -32,7 +32,13 @@ def load_data():
 
     return smiles_all, y
 
-smiles_all, y = load_data()
+
+def load_data(file):
+    if(file == "Nature_SMILES.xlsx"):
+       return load_nature_data()
+
+FILE = "Nature_SMILES.xlsx"
+smiles_all, y = load_data(FILE)
 
 """# --- Load data ---
 xlsx = "Nature_SMILES.xlsx"
