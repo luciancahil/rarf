@@ -22,11 +22,12 @@ def load_data():
     smiles_all = []
 
     for index, row in df.iterrows():
-        cur_smiles = solvent[row["Solvent"]] + imine[row["Imine"]] + nuc[row["Nucleophile"]] + ligand[row["Ligand"]]
+        cur_smiles = [solvent[row["Solvent"]], imine[row["Imine"]], nuc[row["Nucleophile"]], ligand[row["Ligand"]]]
 
         smiles_all.append(cur_smiles)
     
     y = df["DDG"].values
+
 
     return smiles_all, y
 
@@ -42,8 +43,10 @@ y = df["DDG"].values
 # temp fix
 smiles_all = solvent["SMILES_s"].values"""
 
+
+
 # Convert to Morgan fingerprints
-X = np.array([smi2morgan(s, nbits=2048) for s in smiles_all])
+X = np.array([np.hstack([smi2morgan(s, nbits=2048) for s in smiles]) for smiles in smiles_all])
 X = np.vstack(X)
 
 # Split data
