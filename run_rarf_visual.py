@@ -62,7 +62,7 @@ def load_data(file):
         return load_upup_data()
 
 FILES = ["Nature_SMILES.xlsx", "database_ml-new-up-up.csv"]
-file = FILES[1]
+file = FILES[0]
 smiles_all, y = load_data(file)
 
 """# --- Load data ---
@@ -88,7 +88,7 @@ rarf = RaRFRegressor(radius=0.4, metric="jaccard")
 
 print("Hello2!")
 
-out = rarf.fit_predict_shared(X_train, y_train, X_test, budget=int(y.shape[0]/10), alpha=1.2, redundancy_lambda=0.1)
+out = rarf.fit_predict_shared(X_train, y_train, X_test, budget=int(y.shape[0]/10), alpha=1.2, redundancy_lambda=0.1, name = file.split(".")[0])
 
 print("Selected training indices:", out["selected"])
 print("Average neighbors per target:", np.mean(out["neighbor_counts"]))

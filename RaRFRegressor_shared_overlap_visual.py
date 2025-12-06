@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import umap
 from sklearn.ensemble import RandomForestRegressor
 from scipy.spatial.distance import cdist
+import os
+import pickle
+import lmdb
 
 class RaRFRegressor:
     def __init__(self, radius=0.4, metric="jaccard", rf_kwargs=None, random_state=0):
@@ -37,23 +40,47 @@ class RaRFRegressor:
         return model
 
     def greedy_shared_selection(self, X_train, X_test, budget=None, alpha=1.0, redundancy_lambda=0.0,
-                                costs=None, similarity_threshold=None):
+                                costs=None, similarity_threshold=None, name = None):
         T, N = X_test.shape[0], X_train.shape[0]
         # should be 1 for everything unless specified
         costs = np.ones(N) if costs is None else costs.astype(float)
 
-        # similar of test example i to train example j
-        sim_tt = self._pairwise_similarity(X_test, X_train)
 
-        # similarity of train example i to train example j
-        sim_tr = self._pairwise_similarity(X_train, X_train) if redundancy_lambda > 0 else None
+        if not os.path.isdir(name):
+
+            env = lmdb.open('my_lmdb_database', map_size=104857600)  # Example: 100MB map_size
+            print("Calculating tt similarities")
+
+            # similar of test example i to train example j
+            sim_tt = self._pairwise_similarity(X_test, X_train)
+
+            print("Calculating tr similarities")
+
+
+            # similarity of train example i to train example j
+            sim_tr = self._pairwise_similarity(X_train, X_train) if redundancy_lambda > 0 else None
+
+            print("Storing similarities")
+
+            with env.begin(write=True) as txn:
+                # Perform operations within the transaction
+                txn.put("sim_tt".encode(), pickle.dumps(sim_tt))
+                txn.put("sim_tr".encode(), pickle.dumps(sim_tr))
+        else:
+            print("Using Stored similarities")
+            with env.begin(write=True) as txn:
+                # Perform operations within the transaction
+                sim_tt = pickle.loads(txn.get("sim_tt".encode()))
+                sim_tr = pickle.loads(txn.get("sim_tr".encode()))
+
+            
 
         if similarity_threshold is None:
             similarity_threshold = 1.0 - self.radius if self.metric == "jaccard" else None
         neigh_mask = sim_tt >= similarity_threshold
 
         selected = []
-        print("Hello 4!")
+
         def gain(j):
             covered = neigh_mask[:, j]
             if not np.any(covered):
@@ -84,14 +111,14 @@ class RaRFRegressor:
                            similarity_threshold=None,
                            enrich_min_per_target: int = 1,   # if >0, add extra neighbors beyond shared to reach this #
                            enrich_from: str = "neighbors",   # "neighbors" (within tau) or "all" (top-K from all train)
-                           enrich_max_extra: int = 10        # safety cap on per-target added points
+                           enrich_max_extra: int = 10,        # safety cap on per-target added points
+                           name: str = None
                            ):
         
 
-        print("Hello 3!")
         selected, local_sets, sim_tt, neigh_mask, base_tau = self.greedy_shared_selection(
             X_train, X_test, budget=budget, alpha=alpha, redundancy_lambda=redundancy_lambda,
-            similarity_threshold=similarity_threshold
+            similarity_threshold=similarity_threshold, name=name
         )
 
 
@@ -141,9 +168,9 @@ class RaRFRegressor:
 
             What caused the above? I don't know.
             """
-            print(idx_final)
+            print(f"i: {idx_final}")
             X_loc, y_loc = X_train[idx_final], y_train[idx_final]
-            print(y_loc)
+            print(f"y_loc: {y_loc}")
 
             if X_loc.shape[0] == 1: # if we receive only 1, predict.
                 preds[i] = float(y_loc[0])
