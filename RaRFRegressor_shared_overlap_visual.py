@@ -13,10 +13,13 @@ class RaRFRegressor:
         self.random_state = random_state
 
     def _pairwise_distance(self, A, B):
+        print("Before dist")
         if self.metric == "jaccard":
             return cdist((A > 0).astype(bool), (B > 0).astype(bool), metric="jaccard")
         elif self.metric == "euclidean":
             return cdist(A, B, metric="euclidean")
+
+        print("After Dist")
         raise ValueError(f"Unsupported metric: {self.metric}")
 
     def _pairwise_similarity(self, A, B):
@@ -50,7 +53,7 @@ class RaRFRegressor:
         neigh_mask = sim_tt >= similarity_threshold
 
         selected = []
-
+        print("Hello 4!")
         def gain(j):
             covered = neigh_mask[:, j]
             if not np.any(covered):
@@ -59,7 +62,9 @@ class RaRFRegressor:
             penalty = redundancy_lambda * float(np.max(sim_tr[j, selected])) if (redundancy_lambda > 0 and selected) else 0.0
             return gain_val / costs[j] - penalty
 
+        print(budget)
         while True:
+            print(len(selected))
             # if we have selected as many as our budget allows leave
             if budget and len(selected) >= budget: break
             # this is all the elements we haven't selected. If we've selected everything, leave
@@ -83,6 +88,7 @@ class RaRFRegressor:
                            ):
         
 
+        print("Hello 3!")
         selected, local_sets, sim_tt, neigh_mask, base_tau = self.greedy_shared_selection(
             X_train, X_test, budget=budget, alpha=alpha, redundancy_lambda=redundancy_lambda,
             similarity_threshold=similarity_threshold
@@ -95,7 +101,9 @@ class RaRFRegressor:
         # number of local atoms to each.
         ks = []
         final_sets = []
+        print(len(local_sets))
         for i, idx in enumerate(local_sets):
+            print(i)
             # Enrich per-target set if requested.
             # That is, add more to "selected" if need be.
             idx_set = set(idx)
@@ -116,7 +124,26 @@ class RaRFRegressor:
             ks.append(len(idx_final))
             if len(idx_final) == 0:
                 continue
+            """
+            Traceback (most recent call last):
+            File "/home/roy/Documents/rarfviz /run_rarf_visual.py", line 91, in <module>
+                out = rarf.fit_predict_shared(X_train, y_train, X_test, budget=int(y.shape[0]/10), alpha=1.2, redundancy_lambda=0.1)
+            File "/home/roy/Documents/rarfviz /RaRFRegressor_shared_overlap_visual.py", line 130, in fit_predict_shared
+                preds[i] = float(y_loc[0])
+                                ~~~~~^^^
+            File "/home/roy/anaconda3/envs/rarf/lib/python3.13/site-packages/pandas/core/series.py", line 1133, in __getitem__
+                return self._get_value(key)
+                    ~~~~~~~~~~~~~~~^^^^^
+            File "/home/roy/anaconda3/envs/rarf/lib/python3.13/site-packages/pandas/core/series.py", line 1249, in _get_value
+                loc = self.index.get_loc(label)
+            File "/home/roy/anaconda3/envs/rarf/lib/python3.13/site-packages/pandas/core/indexes/base.py", line 3819, in get_loc
+                raise KeyError(key) from err
+
+            What caused the above? I don't know.
+            """
+            print(idx_final)
             X_loc, y_loc = X_train[idx_final], y_train[idx_final]
+            print(y_loc)
 
             if X_loc.shape[0] == 1: # if we receive only 1, predict.
                 preds[i] = float(y_loc[0])
@@ -159,4 +186,4 @@ class RaRFRegressor:
         plt.title(title)
         plt.tight_layout()
         plt.savefig("overlap_map.png", dpi=300)
-        plt.show()
+        #plt.show()

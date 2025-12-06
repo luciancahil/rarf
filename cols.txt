@@ -1,6 +1,1 @@
-Definite Yes:
-Solvent SMILES
-Ligand SMILES
-New Catalyst SMILES(RDKit)
-Reactant SMILES
-Product SMILES
+["Solvent SMILES","Ligand SMILES","New Catalyst SMILES(RDKit)","Reactant SMILES","Product SMILES","ddG"]

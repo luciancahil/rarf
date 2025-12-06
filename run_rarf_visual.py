@@ -30,15 +30,40 @@ def load_nature_data():
     y = df["DDG"].values
 
 
+    return smiles_all[0:366], y[0:366]
+
+
+def load_upup_data():
+    csv_file_path = "database_ml-new-up-up.csv"
+
+    df = pd.read_csv(csv_file_path)
+
+    X_cols = ["Solvent SMILES","Ligand SMILES","New Catalyst SMILES(RDKit)","Reactant SMILES","Product SMILES"]
+
+    y_col = 'ddG'
+    
+
+    smiles_all = []
+    for index, row in df.iterrows():
+        cur_smiles = [row[col] for col in X_cols]
+
+        smiles_all.append(cur_smiles)
+
+
+    y = df[y_col]
+
     return smiles_all, y
 
 
 def load_data(file):
     if(file == "Nature_SMILES.xlsx"):
        return load_nature_data()
+    elif(file=="database_ml-new-up-up.csv"):
+        return load_upup_data()
 
-FILE = "Nature_SMILES.xlsx"
-smiles_all, y = load_data(FILE)
+FILES = ["Nature_SMILES.xlsx", "database_ml-new-up-up.csv"]
+file = FILES[1]
+smiles_all, y = load_data(file)
 
 """# --- Load data ---
 xlsx = "Nature_SMILES.xlsx"
@@ -51,7 +76,6 @@ y = df["DDG"].values
 smiles_all = solvent["SMILES_s"].values"""
 
 
-
 # Convert to Morgan fingerprints
 X = np.array([np.hstack([smi2morgan(s, nbits=2048) for s in smiles]) for smiles in smiles_all])
 X = np.vstack(X)
@@ -61,7 +85,10 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.8, random
 
 # Initialize and run RaRF
 rarf = RaRFRegressor(radius=0.4, metric="jaccard")
-out = rarf.fit_predict_shared(X_train, y_train, X_test, budget=30, alpha=1.2, redundancy_lambda=0.1)
+
+print("Hello2!")
+
+out = rarf.fit_predict_shared(X_train, y_train, X_test, budget=int(y.shape[0]/10), alpha=1.2, redundancy_lambda=0.1)
 
 print("Selected training indices:", out["selected"])
 print("Average neighbors per target:", np.mean(out["neighbor_counts"]))
@@ -71,11 +98,15 @@ print("Predictions shape:", out["preds"].shape)
 rarf.plot_overlap_map(X_train, X_test, out["selected"])
 print("Saved plot as overlap_map.png")
 
-breakpoint()
 
 plt.clf()
 plt.scatter(out['preds'], y_test)
 
-plt.show()
-# Find out where the error is.
-#PLOT The Prediction vs Actual.
+
+
+
+file = open(f"./predictions/{file}", mode='w')
+
+file.write(str(out['preds'].tolist()))
+file.write("\n")
+file.write(str(y.tolist()))
